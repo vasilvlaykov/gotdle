@@ -3,7 +3,7 @@ type CongratsModalProps = {
   onClose: () => void;
 };
 
-export default function CongratsModal({ show, onClose }) {
+export default function CongratsModal({ show, onClose }: CongratsModalProps) {
   if (!show) return null;
 
   return (
