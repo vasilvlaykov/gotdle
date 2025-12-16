@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import GlobalModals from "@/app/components/GlobalModals";
 import Logo from "@/app/components/Logo";
 
 export const metadata: Metadata = {
@@ -38,8 +37,6 @@ export default function RootLayout({
 
           {children}
         </div>
-
-        <GlobalModals />
       </body>
     </html>
   );
