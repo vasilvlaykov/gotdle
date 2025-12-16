@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import GameCard from "./components/GameCard";
 import useGameProgress from "@/hooks/useGameProgress";
 import CountdownTimer from "./components/CountdownTimer";
+import DisclaimerTooltip from "./components/DisclaimerTooltip";
 
 export default function HomePage() {
   const { state } = useGameProgress();
@@ -38,7 +39,7 @@ export default function HomePage() {
   }, [hasHydrated, allCompleted]);
 
   return (
-    <main style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
+    <main className="relative" style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
       <section style={{ display: "grid", gap: "1rem" }} className="got-font">
         <Link href="/classic" passHref>
           <GameCard
@@ -78,6 +79,9 @@ export default function HomePage() {
           <CountdownTimer classList="absolute text-center top-55 countdown" />
         </div>
       )}
+      <div className="absolute top-4 right-4 z-50">
+        <DisclaimerTooltip />
+      </div>
     </main>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import GlobalModals from "@/app/components/GlobalModals";
-import Logo from "@/app/components/Logo"; // <-- add this
+import Logo from "@/app/components/Logo";
 
 export const metadata: Metadata = {
   title: "Game of Thrones Loldle",
