@@ -320,7 +320,7 @@ export default function QuoteGame() {
       </div>
 
       {/* Win Message */}
-      {showWinMessage && (
+      {showWinMessage && correctGuess && (
         <div ref={winRef}>
           <WinMessage
             character={correctGuess}
