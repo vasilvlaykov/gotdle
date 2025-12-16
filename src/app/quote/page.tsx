@@ -149,7 +149,7 @@ export default function QuoteGame() {
     const res = await fetch("/api/quotes/check", {
       method: "POST",
       body: JSON.stringify({
-        quoteUuid: quote.uuid,
+        quoteUuid: quote?.uuid,
         guessUuid: character.uuid,
       }),
       headers: { "Content-Type": "application/json" },
