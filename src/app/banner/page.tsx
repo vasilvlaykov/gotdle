@@ -130,7 +130,7 @@ export default function BannerGame() {
       return;
     }
 
-    if (guess.uuid === target.uuid) {
+    if (target && guess.uuid === target.uuid) {
       setCorrectGuess(guess);
 
       markCompleted("banner");
