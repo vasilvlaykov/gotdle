@@ -1,3 +1,8 @@
+type CongratsModalProps = {
+  show: boolean;
+  onClose: () => void;
+};
+
 export default function CongratsModal({ show, onClose }) {
   if (!show) return null;
 
