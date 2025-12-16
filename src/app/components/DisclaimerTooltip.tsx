@@ -34,7 +34,7 @@ export default function DisclaimerTooltip() {
   }, [visible]);
 
   return (
-    <div className="fixed top-8 right-4 z-50">
+    <div className="sticky top-8 right-4 z-50">
       <div
         ref={iconRef}
         onClick={handleIconClick}

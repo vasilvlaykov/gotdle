@@ -39,7 +39,7 @@ export default function HomePage() {
   }, [hasHydrated, allCompleted]);
 
   return (
-    <main className="relative" style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
+    <main style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
       <section style={{ display: "grid", gap: "1rem" }} className="got-font">
         <Link href="/classic" passHref>
           <GameCard
