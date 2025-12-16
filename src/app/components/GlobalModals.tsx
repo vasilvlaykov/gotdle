@@ -5,7 +5,8 @@ import CongratsModal from "@/app/components/CongratsModal";
 import useGameProgress from "@/hooks/useGameProgress";
 
 export default function GlobalModals() {
-  const { allCompleted } = useGameProgress();
+  const { state } = useGameProgress();
+  const allCompleted = state.classicDone && state.quoteDone && state.bannerDone;
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
