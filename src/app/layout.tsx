@@ -4,7 +4,7 @@ import GlobalModals from "@/app/components/GlobalModals";
 import Logo from "@/app/components/Logo";
 
 export const metadata: Metadata = {
-  title: "Game of Thrones Loldle",
+  title: "GoTdle",
   description: "A GOT-themed guessing game",
 };
 

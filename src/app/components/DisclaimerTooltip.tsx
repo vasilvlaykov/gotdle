@@ -41,7 +41,7 @@ export default function DisclaimerTooltip() {
         className="cursor-pointer select-none"
       >
         <Image
-          src="/assets/disclaimer-tooltip.png"
+          src="/assets/disclaimer-tooltip-icon.png"
           alt="Disclaimer"
           width={50}
           height={50}
