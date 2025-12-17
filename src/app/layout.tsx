@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Logo from "@/app/components/Logo";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "GoTdle",
@@ -36,6 +37,7 @@ export default function RootLayout({
           </header>
 
           {children}
+          <Analytics/>
         </div>
       </body>
     </html>
