@@ -5,7 +5,29 @@ import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "GoTdle",
-  description: "A GOT-themed guessing game",
+  description: "A Game of Thrones-themed guessing game",
+  openGraph: {
+    title: "GoTdle",
+    description: "A Game of Thrones-themed guessing game",
+    url: "https://www.gotdle.com/",
+    siteName: "GoTdle",
+    images: [
+      {
+        url: "https://www.gotdle.com/assets/social-preview.png",
+        width: 1200,
+        height: 630,
+        alt: "GoTdle Game Preview",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GoTdle",
+    description: "A Game of Thrones-themed guessing game",
+    images: ["https://www.gotdle.com/assets/social-preview.png"],
+  },
 };
 
 export default function RootLayout({
