@@ -76,7 +76,7 @@ export default function HomePage() {
             className="congrats-banner-img"
           />
 
-          <CountdownTimer classList="absolute text-center top-55 countdown" />
+          <CountdownTimer classList="absolute text-center top-1/2 countdown" />
         </div>
       )}
       <div className="absolute top-4 right-4 z-50">

@@ -255,52 +255,59 @@ export default function ClassicGame() {
       )}
 
       {guesses.length > 0 && (
-        <div className="mt-4 w-full max-w-xl mx-auto">
-          <div className="grid grid-cols-[100px_repeat(4,100px)] gap-2 select-none font-semibold text-center mb-2">
-            <div className="h-[40px] flex items-center justify-center char-guess-header">
-              Character
+        <div>
+          <div className="mt-4 w-full overflow-x-auto">
+            <div className="min-w-[520px] mx-auto">
+            <div className="grid grid-cols-[100px_repeat(4,100px)] gap-2 select-none font-semibold text-center mb-2">
+              <div className="h-[40px] flex items-center justify-center char-guess-header">
+                Character
+              </div>
+              <div className="h-[40px] flex items-center justify-center char-guess-header">
+                Status
+              </div>
+              <div className="h-[40px] flex items-center justify-center char-guess-header">
+                Gender
+              </div>
+              <div className="h-[40px] flex items-center justify-center char-guess-header">
+                Region
+              </div>
+              <div className="h-[40px] flex items-center justify-center char-guess-header">
+                Affiliations
+              </div>
             </div>
-            <div className="h-[40px] flex items-center justify-center char-guess-header">
-              Status
-            </div>
-            <div className="h-[40px] flex items-center justify-center char-guess-header">
-              Gender
-            </div>
-            <div className="h-[40px] flex items-center justify-center char-guess-header">
-              Region
-            </div>
-            <div className="h-[40px] flex items-center justify-center char-guess-header">
-              Affiliations
+
+            {guesses.map((g) => {
+              const baseDelay = 0;
+
+              return (
+                <div
+                  key={g.guess.uuid}
+                  className="grid grid-cols-[100px_repeat(4,100px)] gap-2 items-center mb-3"
+                >
+                  <div className="w-[100px] h-[100px] flex items-center justify-center">
+                    <img
+                      src={g.guess.image_url}
+                      alt={g.guess.name}
+                      className="w-[100px] h-[100px] object-cover character-hint-img"
+                    />
+                  </div>
+
+                  {renderHint(g.guess.status ?? "Unknown", g.hints.status, baseDelay + 0)}
+                  {renderHint(g.guess.gender ?? "Unknown", g.hints.gender, baseDelay + 300)}
+                  {renderHint(g.guess.region ?? "Unknown", g.hints.region, baseDelay + 600)}
+                  {renderHint(
+                    formatAffiliations(g.guess.affiliations),
+                    g.hints.affiliations,
+                    baseDelay + 900
+                  )}
+                </div>
+              );
+            })}
             </div>
           </div>
-
-          {guesses.map((g) => {
-            const baseDelay = 0;
-
-            return (
-              <div
-                key={g.guess.uuid}
-                className="grid grid-cols-[100px_repeat(4,100px)] gap-2 items-center mb-3"
-              >
-                <div className="w-[100px] h-[100px] flex items-center justify-center">
-                  <img
-                    src={g.guess.image_url}
-                    alt={g.guess.name}
-                    className="w-[100px] h-[100px] object-cover character-hint-img"
-                  />
-                </div>
-
-                {renderHint(g.guess.status ?? "Unknown", g.hints.status, baseDelay + 0)}
-                {renderHint(g.guess.gender ?? "Unknown", g.hints.gender, baseDelay + 300)}
-                {renderHint(g.guess.region ?? "Unknown", g.hints.region, baseDelay + 600)}
-                {renderHint(
-                  formatAffiliations(g.guess.affiliations),
-                  g.hints.affiliations,
-                  baseDelay + 900
-                )}
-              </div>
-            );
-          })}
+          <div className="block sm:hidden text-center text-sm text-gray-400 mb-1 select-none px-1">
+            ← Swipe to see more →
+          </div>
         </div>
       )}
 
