@@ -13,6 +13,8 @@ import {
   removeFromLocalStorage,
 } from "@/lib/localStorage";
 
+import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key
+
 type Character = {
   uuid: string;
   name: string;
@@ -41,7 +43,6 @@ type QuoteGameState = {
   hintRevealed: boolean;
 };
 
-const STORAGE_KEY = "quoteGameState";
 const HINT_THRESHOLD = 5;
 
 export default function QuoteGame() {
@@ -54,14 +55,16 @@ export default function QuoteGame() {
   const [showCelebrate, setShowCelebrate] = useState(false);
   const [showWinMessage, setShowWinMessage] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
-  const [justAddedWrongGuessUuid, setJustAddedWrongGuessUuid] = useState<
-    string | null
-  >(null);
+  const [justAddedWrongGuessUuid, setJustAddedWrongGuessUuid] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const winRef = useRef<HTMLDivElement>(null);
 
   const { markCompleted } = useGameProgress();
+
+  // Use daily key for storage
+  const dailyKey = getDailyKey();
+  const STORAGE_KEY = `quoteGameState_${dailyKey}`;
 
   useEffect(() => {
     async function loadQuote() {
@@ -88,7 +91,7 @@ export default function QuoteGame() {
     }
 
     loadQuote();
-  }, []);
+  }, [STORAGE_KEY]);
 
   useEffect(() => {
     if (!quote) return;
@@ -99,7 +102,7 @@ export default function QuoteGame() {
       showWinMessage,
       hintRevealed,
     });
-  }, [quote, wrongGuesses, correctGuess, showWinMessage, hintRevealed]);
+  }, [quote, wrongGuesses, correctGuess, showWinMessage, hintRevealed, STORAGE_KEY]);
 
   function launchConfetti() {
     confetti({
@@ -140,7 +143,15 @@ export default function QuoteGame() {
     setSuggestions(filtered);
   }, [query, characters, wrongGuesses, correctGuess]);
 
-  if (!quote) return <div className="flex flex-col items-center"><h1 className="text-5xl text-white text-center got-font font-bold mb-4">Winter is loading...</h1> <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div></div>
+  if (!quote)
+    return (
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl text-white text-center got-font font-bold mb-4">
+          Winter is loading...
+        </h1>{" "}
+        <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div>
+      </div>
+    );
 
   async function handleGuess(character: Character) {
     setQuery("");
@@ -206,9 +217,7 @@ export default function QuoteGame() {
 
         {hintUnlocked && hintRevealed && (
           <div className="p-4 rounded border border-yellow-500 text-center quote-recipient-banner got-font text-xl">
-            <h3 className="font-bold mb-2">
-              Recipient of the quote:
-            </h3>
+            <h3 className="font-bold mb-2">Recipient of the quote:</h3>
             <img
               src={quote.recipient_image_url}
               alt="Quote recipient"
@@ -278,9 +287,7 @@ export default function QuoteGame() {
               alt={correctGuess.name}
               className="w-15 h-15 rounded object-cover border border-green-600"
             />
-            <span className="font-semibold">
-              {correctGuess.name}
-            </span>
+            <span className="font-semibold">{correctGuess.name}</span>
           </div>
         )}
 
@@ -291,9 +298,7 @@ export default function QuoteGame() {
               alt={correctGuess.name}
               className="w-15 h-15 rounded object-cover border border-green-600"
             />
-            <span className="font-semibold">
-              {correctGuess.name}
-            </span>
+            <span className="font-semibold">{correctGuess.name}</span>
           </div>
         )}
 

@@ -6,6 +6,7 @@ import {
   loadFromLocalStorage,
   removeFromLocalStorage,
 } from "@/lib/localStorage";
+import { getDailyKey } from "@/lib/dailyKey";
 
 export type GameKey = "classic" | "quote" | "banner";
 
@@ -14,6 +15,7 @@ export type GameCompletionState = {
   quoteDone: boolean;
   bannerDone: boolean;
   celebrationShown: boolean;
+  dateKey: string;
 };
 
 const STORAGE_KEY = "gameCompletionState";
@@ -24,6 +26,7 @@ function defaultState(): GameCompletionState {
     quoteDone: false,
     bannerDone: false,
     celebrationShown: false,
+    dateKey: getDailyKey(),
   };
 }
 
@@ -31,7 +34,14 @@ export default function useGameProgress() {
   const [state, setState] = useState<GameCompletionState>(() => {
     try {
       const saved = loadFromLocalStorage<GameCompletionState>(STORAGE_KEY);
-      return saved ?? defaultState();
+      if (saved) {
+        // If stored dateKey is different from today, reset state
+        if (saved.dateKey !== getDailyKey()) {
+          return defaultState();
+        }
+        return saved;
+      }
+      return defaultState();
     } catch {
       return defaultState();
     }
@@ -39,16 +49,32 @@ export default function useGameProgress() {
 
   const [showCongratsModal, setShowCongratsModal] = useState(false);
 
+  // Save state on change
   useEffect(() => {
     saveToLocalStorage(STORAGE_KEY, state);
   }, [state]);
 
+  // Check daily reset and congrats modal
   useEffect(() => {
-    if (state.classicDone && state.quoteDone && state.bannerDone && !state.celebrationShown) {
+    const today = getDailyKey();
+
+    if (state.dateKey !== today) {
+      // New day — reset progress
+      setState(defaultState());
+      setShowCongratsModal(false);
+      return;
+    }
+
+    if (
+      state.classicDone &&
+      state.quoteDone &&
+      state.bannerDone &&
+      !state.celebrationShown
+    ) {
       setShowCongratsModal(true);
       setState((prev) => ({ ...prev, celebrationShown: true }));
     }
-  }, []);
+  }, [state]);
 
   const markCompleted = useCallback((game: GameKey) => {
     setState((prev) => {
@@ -57,10 +83,16 @@ export default function useGameProgress() {
       if (game === "quote") next.quoteDone = true;
       if (game === "banner") next.bannerDone = true;
 
-      if (next.classicDone && next.quoteDone && next.bannerDone && !next.celebrationShown) {
+      if (
+        next.classicDone &&
+        next.quoteDone &&
+        next.bannerDone &&
+        !next.celebrationShown
+      ) {
         setShowCongratsModal(true);
         next.celebrationShown = true;
       }
+
       return next;
     });
   }, []);
@@ -69,7 +101,9 @@ export default function useGameProgress() {
     (game: GameKey) => {
       if (game === "classic") return state.classicDone;
       if (game === "quote") return state.quoteDone;
-      return state.bannerDone;
+      if (game === "banner") return state.bannerDone;
+      
+      return false;
     },
     [state]
   );

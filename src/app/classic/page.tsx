@@ -14,6 +14,8 @@ import {
   removeFromLocalStorage,
 } from "@/lib/localStorage";
 
+import { getDailyKey } from "@/lib/dailyKey"; // <-- import dailyKey helper
+
 type Character = {
   uuid: string;
   name: string;
@@ -36,7 +38,6 @@ type GuessResult = {
   today?: Character | null;
 };
 
-const STORAGE_KEY = "classicGameState";
 
 export default function ClassicGame() {
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -48,6 +49,9 @@ export default function ClassicGame() {
   const winMessageRef = useRef<HTMLDivElement>(null);
 
   const { markCompleted } = useGameProgress();
+
+  const dailyKey = getDailyKey();
+  const STORAGE_KEY = `classicGameState_${dailyKey}`; // key scoped by day
 
   // Load characters and saved state together
   useEffect(() => {
@@ -62,8 +66,8 @@ export default function ClassicGame() {
         const { data } = await res.json();
         setCharacters(data || []);
 
-        // Restore saved state only after characters load
-        const saved = loadFromLocalStorage<{ guesses: GuessResult[]; showWinMessage: boolean }>(STORAGE_KEY);
+        const saved = loadFromLocalStorage<{ guesses: GuessResult[]; showWinMessage: boolean; dailyKey?: string }>(STORAGE_KEY);
+
         if (saved) {
           if (saved.guesses) setGuesses(saved.guesses);
           if (saved.showWinMessage) setShowWinMessage(saved.showWinMessage);
@@ -75,13 +79,13 @@ export default function ClassicGame() {
       }
     }
     loadData();
-  }, []);
+  }, [STORAGE_KEY]);
 
   // Save state on guesses or win message change
   useEffect(() => {
     if (isLoading) return;
     saveToLocalStorage(STORAGE_KEY, { guesses, showWinMessage });
-  }, [guesses, showWinMessage, isLoading]);
+  }, [guesses, showWinMessage, isLoading, STORAGE_KEY]);
 
   useEffect(() => {
     if (!query.trim() || showWinMessage) {
@@ -137,7 +141,6 @@ export default function ClassicGame() {
       colors: ["FF4500", "00BFFF"],
       shapes: ["circle", "circle", "square"],
     });
-
   }
 
   async function handleGuess(character: Character) {
@@ -199,16 +202,27 @@ export default function ClassicGame() {
   }, [showWinMessage]);
 
   if (isLoading) {
-    return <div className="flex flex-col items-center"><h1 className="text-5xl text-white text-center got-font font-bold mb-4">Winter is loading...</h1> <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div></div>
+    return (
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl text-white text-center got-font font-bold mb-4">
+          Winter is loading...
+        </h1>{" "}
+        <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-xl mx-auto p-4 space-y-4 relative game-box rounded-2xl">
-      <h1 className="text-3xl font-bold mb-4 text-center got-font">Guess today's character</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center got-font">
+        Guess today's character
+      </h1>
 
       {!showWinMessage && (
         <>
-          <h3 className="text-sm got-font font-bold mb-4 text-center">Type any character to begin.</h3>
+          <h3 className="text-sm got-font font-bold mb-4 text-center">
+            Type any character to begin.
+          </h3>
 
           <input
             type="text"
@@ -298,9 +312,7 @@ export default function ClassicGame() {
             nextLabel="Play Quote Mode →"
             onClose={() => setShowWinMessage(false)}
           >
-            <CountdownTimer
-              prefixText="Next character available in:"
-            />
+            <CountdownTimer prefixText="Next character available in:" />
           </WinMessage>
         </div>
       )}

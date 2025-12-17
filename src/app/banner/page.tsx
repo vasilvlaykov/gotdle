@@ -5,6 +5,7 @@ import { sortSuggestions } from "@/utils/sortSuggestions";
 import CountdownTimer from "../components/CountdownTimer";
 import confetti from "canvas-confetti";
 import useGameProgress from "@/hooks/useGameProgress";
+import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key helper
 
 type Banner = {
   uuid: string;
@@ -12,7 +13,8 @@ type Banner = {
   image_url: string;
 };
 
-const STORAGE_KEY = "bannerGameState";
+const dailyKey = getDailyKey();
+const STORAGE_KEY = `bannerGameState_${dailyKey}`;
 
 export default function BannerGame() {
   const [houses, setHouses] = useState<Banner[]>([]);
@@ -68,7 +70,7 @@ export default function BannerGame() {
     }
 
     loadGame();
-  }, []);
+  }, [STORAGE_KEY]);
 
   useEffect(() => {
     if (correctGuess || wrongGuesses.length > 0) {
@@ -77,7 +79,7 @@ export default function BannerGame() {
         JSON.stringify({ correctGuess, wrongGuesses })
       );
     }
-  }, [correctGuess, wrongGuesses]);
+  }, [correctGuess, wrongGuesses, STORAGE_KEY]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -96,8 +98,15 @@ export default function BannerGame() {
     setSuggestions(filtered);
   }, [query, houses, wrongGuesses, correctGuess]);
 
-  if (!target) return <div className="flex flex-col items-center"><h1 className="text-5xl text-white text-center got-font font-bold mb-4">Winter is loading...</h1> <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div></div>
-;
+  if (!target)
+    return (
+      <div className="flex flex-col items-center">
+        <h1 className="text-5xl text-white text-center got-font font-bold mb-4">
+          Winter is loading...
+        </h1>{" "}
+        <div className="w-12 h-12 border-6 border-white/30 border-t-white rounded-full animate-spin text-center"></div>
+      </div>
+    );
 
   const blurValue = correctGuess
     ? 0
@@ -153,7 +162,9 @@ export default function BannerGame() {
 
   return (
     <div className="max-w-xl mx-auto p-4 space-y-4 relative game-box rounded-2xl">
-      <h1 className="text-3xl font-bold mb-4 text-center got-font mb-12">Guess the House Banner</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center got-font mb-12">
+        Guess the House Banner
+      </h1>
 
       <div
         ref={bannerRef}
@@ -224,9 +235,7 @@ export default function BannerGame() {
             alt={correctGuess.house_name}
             className="w-15 h-15 rounded object-cover"
           />
-          <span className="font-semibold text-xl">
-            {correctGuess.house_name}
-          </span>
+          <span className="font-semibold text-xl">{correctGuess.house_name}</span>
         </div>
       )}
 
