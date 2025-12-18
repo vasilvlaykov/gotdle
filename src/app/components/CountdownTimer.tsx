@@ -6,16 +6,19 @@ interface CountdownTimerProps {
   onComplete?: () => void;
 }
 
-function getNextMidnight() {
+function getNextMidnightUTC() {
   const now = new Date();
-  const d = new Date(now);
-  d.setHours(24, 0, 0, 0);
-  return d;
+  return new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + 1,
+    0, 0, 0
+  ));
 }
 
 export default function CountdownTimer({ prefixText, classList, onComplete }: CountdownTimerProps) {
   const [secondsLeft, setSecondsLeft] = useState(() => {
-    const targetTime = getNextMidnight();
+    const targetTime = getNextMidnightUTC();
     const diff = Math.floor((targetTime.getTime() - new Date().getTime()) / 1000);
     return diff > 0 ? diff : 0;
   });
