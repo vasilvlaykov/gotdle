@@ -28,7 +28,7 @@ export default function BannerGame() {
   const successRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
 
-  const maxBlur = 20;
+  const maxBlur = 10;
 
   const { markCompleted } = useGameProgress();
 
@@ -199,16 +199,21 @@ export default function BannerGame() {
       )}
 
       {!correctGuess && (
-        <input
-          type="text"
-          placeholder="Type a house name..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full px-3 py-2 border rounded"
-          autoComplete="off"
-          ref={inputRef}
-          disabled={!!correctGuess}
-        />
+        <div>
+          <h3 className="text-sm got-font font-bold mb-4 text-center">
+            Each try unblurs the image a bit
+          </h3>
+          <input
+            type="text"
+            placeholder="Type a house name..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full px-3 py-2 border rounded"
+            autoComplete="off"
+            ref={inputRef}
+            disabled={!!correctGuess}
+          />
+        </div>
       )}
 
       {suggestions.length > 0 && !correctGuess && (
