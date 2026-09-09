@@ -1,35 +1,26 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getDailyKey } from "@/lib/dailyKey";
+import { getDeterministicDailyIndex } from "@/lib/dailyIndex";
 
 export async function POST(req: Request) {
-  const { bannerUuid, guessName } = await req.json();
+  const { guessUuid } = await req.json();
 
-  if (!bannerUuid || !guessName) {
-    return NextResponse.json(
-      { error: "Missing fields" },
-      { status: 400 }
-    );
+  if (!guessUuid) {
+    return NextResponse.json({ error: "Missing guessUuid" }, { status: 400 });
   }
 
-  const { data: banner, error } = await supabase
+  const { data: banners, error } = await supabase
     .from("banners")
-    .select("*")
-    .eq("uuid", bannerUuid)
-    .single();
+    .select("uuid")
+    .order("house_name", { ascending: true });
 
-  if (error || !banner) {
-    return NextResponse.json(
-      { error: "Banner not found" },
-      { status: 404 }
-    );
+  if (error || !banners || banners.length === 0) {
+    return NextResponse.json({ error: "Failed to load banners" }, { status: 500 });
   }
 
-  const correct =
-    banner.house_name.trim().toLowerCase() ===
-    guessName.trim().toLowerCase();
+  const index = getDeterministicDailyIndex(banners.length, getDailyKey());
+  const target = banners[index];
 
-  return NextResponse.json({
-    correct,
-    banner,
-  });
+  return NextResponse.json({ correct: guessUuid === target.uuid });
 }

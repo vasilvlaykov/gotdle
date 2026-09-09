@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { getDailyKey } from "@/lib/dailyKey";
+import { getDeterministicDailyIndex } from "@/lib/dailyIndex";
 
 function safeParseAffiliations(affs: any): string[] {
   if (Array.isArray(affs)) return affs;
@@ -43,7 +45,8 @@ export async function POST(request: Request) {
 
     const { data: characters, error } = await supabase
       .from("characters")
-      .select("*");
+      .select("*")
+      .order("uuid", { ascending: true });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -53,8 +56,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No characters found" }, { status: 500 });
     }
 
-    const day = new Date().getDate();
-    const today = characters[day % characters.length];
+    const index = getDeterministicDailyIndex(characters.length, getDailyKey());
+    const today = characters[index];
     const guess = characters.find((c) => c.uuid === guessUuid);
 
     if (!guess) {

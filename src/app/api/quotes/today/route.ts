@@ -5,7 +5,8 @@ export async function GET() {
   try {
     const { data: quotes, error } = await supabase
       .from("quotes")
-      .select("*");
+      .select("uuid, quote, recipient_id, recipient_image_url")
+      .order("uuid", { ascending: true });
 
     if (error) {
       console.error("supabase /quotes error:", error);
@@ -16,6 +17,8 @@ export async function GET() {
       return NextResponse.json({ data: null });
     }
 
+    // author_id / author_image_url are the answer to "who said this quote" —
+    // deliberately excluded here. /api/quotes/check verifies guesses server-side.
     const dayNumber = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
     const index = dayNumber % quotes.length;
     const today = quotes[index];

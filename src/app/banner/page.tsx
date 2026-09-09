@@ -18,17 +18,16 @@ const STORAGE_KEY = `bannerGameState_${dailyKey}`;
 
 export default function BannerGame() {
   const [houses, setHouses] = useState<Banner[]>([]);
-  const [target, setTarget] = useState<Banner | null>(null);
+  const [ready, setReady] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Banner[]>([]);
   const [wrongGuesses, setWrongGuesses] = useState<Banner[]>([]);
   const [correctGuess, setCorrectGuess] = useState<Banner | null>(null);
+  const [checking, setChecking] = useState(false);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
-
-  const maxBlur = 10;
 
   const { markCompleted } = useGameProgress();
 
@@ -49,9 +48,7 @@ export default function BannerGame() {
       const housesJson = await housesRes.json();
       const todayJson = await todayRes.json();
 
-      if (todayJson?.data) {
-        setTarget(todayJson.data);
-      }
+      setReady(!!todayJson?.data);
 
       const fetchedHouses: Banner[] = housesJson.data || [];
 
@@ -70,7 +67,7 @@ export default function BannerGame() {
     }
 
     loadGame();
-  }, [STORAGE_KEY]);
+  }, []);
 
   useEffect(() => {
     if (correctGuess || wrongGuesses.length > 0) {
@@ -79,7 +76,7 @@ export default function BannerGame() {
         JSON.stringify({ correctGuess, wrongGuesses })
       );
     }
-  }, [correctGuess, wrongGuesses, STORAGE_KEY]);
+  }, [correctGuess, wrongGuesses]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -98,7 +95,7 @@ export default function BannerGame() {
     setSuggestions(filtered);
   }, [query, houses, wrongGuesses, correctGuess]);
 
-  if (!target)
+  if (!ready)
     return (
       <div className="flex flex-col items-center">
         <h1 className="text-5xl text-white text-center got-font font-bold mb-4">
@@ -108,9 +105,12 @@ export default function BannerGame() {
       </div>
     );
 
-  const blurValue = correctGuess
-    ? 0
-    : Math.max(0, maxBlur - (wrongGuesses.length * maxBlur) / 5);
+  // The banner image is blurred server-side (see /api/banners/image) based on
+  // wrong-guess count — the unblurred source is never sent to the client
+  // before it's earned, unlike a client-side CSS blur which can be inspected.
+  const imageSrc = `/api/banners/image?wrong=${wrongGuesses.length}${
+    correctGuess ? "&revealed=1" : ""
+  }`;
 
   function launchConfetti() {
     if (!bannerRef.current) return;
@@ -132,6 +132,7 @@ export default function BannerGame() {
     setSuggestions([]);
 
     if (
+      checking ||
       wrongGuesses.some((w) => w.uuid === guess.uuid) ||
       (correctGuess && correctGuess.uuid === guess.uuid)
     ) {
@@ -139,25 +140,39 @@ export default function BannerGame() {
       return;
     }
 
-    if (target && guess.uuid === target.uuid) {
-      setCorrectGuess(guess);
+    setChecking(true);
+    try {
+      const res = await fetch("/api/banners/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guessUuid: guess.uuid }),
+      });
+      const { correct } = await res.json();
 
-      markCompleted("banner");
+      if (correct) {
+        setCorrectGuess(guess);
 
-      setTimeout(() => {
-        launchConfetti();
+        markCompleted("banner");
 
-        successRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }, 300);
-    } else {
-      setWrongGuesses((prev) => [guess, ...prev]);
+        setTimeout(() => {
+          launchConfetti();
+
+          successRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }, 300);
+      } else {
+        setWrongGuesses((prev) => [guess, ...prev]);
+      }
+
+      setHouses((prev) => prev.filter((h) => h.uuid !== guess.uuid));
+    } catch (err) {
+      console.error("Guess check error:", err);
+    } finally {
+      setChecking(false);
+      inputRef.current?.focus();
     }
-
-    setHouses((prev) => prev.filter((h) => h.uuid !== guess.uuid));
-    inputRef.current?.focus();
   }
 
   return (
@@ -172,14 +187,12 @@ export default function BannerGame() {
         style={{
           width: 240,
           height: 240,
-          filter: `blur(${blurValue}px)`,
-          transition: "filter 0.5s ease",
           position: "relative",
         }}
       >
         <img
-          src={target.image_url}
-          alt={target.house_name}
+          src={imageSrc}
+          alt={correctGuess ? correctGuess.house_name : "Mystery banner"}
           className="w-full h-full object-contain rounded-lg"
           draggable={false}
         />
@@ -192,7 +205,7 @@ export default function BannerGame() {
         >
           <h2 className="text-3xl font-bold mb-4">You win</h2>
           <p className="text-xl mb-12">
-            This is the banner of House <strong>{target.house_name}</strong>.
+            This is the banner of House <strong>{correctGuess.house_name}</strong>.
           </p>
           <CountdownTimer prefixText="Next banner available in:" />
         </div>

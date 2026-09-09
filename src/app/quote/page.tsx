@@ -24,8 +24,6 @@ type Character = {
 type Quote = {
   uuid: string;
   quote: string;
-  author_id: string;
-  author_image_url: string;
   recipient_id: string;
   recipient_image_url: string;
 };

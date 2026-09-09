@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage,
-  removeFromLocalStorage,
-} from "@/lib/localStorage";
+import { saveToLocalStorage, loadFromLocalStorage } from "@/lib/localStorage";
 import { getDailyKey } from "@/lib/dailyKey";
 
 export type GameKey = "classic" | "quote" | "banner";
@@ -14,7 +10,6 @@ export type GameCompletionState = {
   classicDone: boolean;
   quoteDone: boolean;
   bannerDone: boolean;
-  celebrationShown: boolean;
   dateKey: string;
 };
 
@@ -25,7 +20,6 @@ function defaultState(): GameCompletionState {
     classicDone: false,
     quoteDone: false,
     bannerDone: false,
-    celebrationShown: false,
     dateKey: getDailyKey(),
   };
 }
@@ -47,72 +41,30 @@ export default function useGameProgress() {
     }
   });
 
-  const [showCongratsModal, setShowCongratsModal] = useState(false);
-
   // Save state on change
   useEffect(() => {
     saveToLocalStorage(STORAGE_KEY, state);
   }, [state]);
 
-  // Check daily reset and congrats modal
+  // Check daily reset
   useEffect(() => {
     const today = getDailyKey();
-
     if (state.dateKey !== today) {
-      // New day — reset progress
       setState(defaultState());
-      setShowCongratsModal(false);
-      return;
     }
-
-    if (
-      state.classicDone &&
-      state.quoteDone &&
-      state.bannerDone &&
-      !state.celebrationShown
-    ) {
-      setShowCongratsModal(true);
-      setState((prev) => ({ ...prev, celebrationShown: true }));
-    }
-  }, [state]);
+  }, [state.dateKey]);
 
   const markCompleted = useCallback((game: GameKey) => {
-    setState((prev) => {
-      const next = { ...prev };
-      if (game === "classic") next.classicDone = true;
-      if (game === "quote") next.quoteDone = true;
-      if (game === "banner") next.bannerDone = true;
-
-      if (
-        next.classicDone &&
-        next.quoteDone &&
-        next.bannerDone &&
-        !next.celebrationShown
-      ) {
-        setShowCongratsModal(true);
-        next.celebrationShown = true;
-      }
-
-      return next;
-    });
+    setState((prev) => ({
+      ...prev,
+      classicDone: game === "classic" ? true : prev.classicDone,
+      quoteDone: game === "quote" ? true : prev.quoteDone,
+      bannerDone: game === "banner" ? true : prev.bannerDone,
+    }));
   }, []);
-
-  const isCompleted = useCallback(
-    (game: GameKey) => {
-      if (game === "classic") return state.classicDone;
-      if (game === "quote") return state.quoteDone;
-      if (game === "banner") return state.bannerDone;
-      
-      return false;
-    },
-    [state]
-  );
 
   return {
     state,
     markCompleted,
-    isCompleted,
-    showCongratsModal,
-    setShowCongratsModal,
   };
 }

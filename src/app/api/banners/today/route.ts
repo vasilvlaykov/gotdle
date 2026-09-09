@@ -1,23 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
+// Intentionally does NOT return which banner is today's answer — the uuid
+// alone would be enough to look up house_name/image_url via /api/banners/all.
+// The client only needs to know a puzzle exists; /api/banners/image and
+// /api/banners/check compute today's target server-side.
 export async function GET() {
-
-  // deterministic daily index
-  const today = new Date().toISOString().slice(0, 10);
-  const seed = [...today].reduce((acc, c) => acc + c.charCodeAt(0), 0);
-
-  const { data: banners } = await supabase
+  const { data: banners, error } = await supabase
     .from("banners")
-    .select("*")
+    .select("uuid")
     .order("house_name", { ascending: true });
 
-  if (!banners || banners.length === 0) {
+  if (error || !banners || banners.length === 0) {
     return NextResponse.json({ data: null });
   }
 
-  const index = seed % banners.length;
-  const daily = banners[index];
-
-  return NextResponse.json({ data: daily });
+  return NextResponse.json({ data: { available: true } });
 }
