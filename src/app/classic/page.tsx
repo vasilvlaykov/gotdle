@@ -15,6 +15,7 @@ import {
 } from "@/lib/localStorage";
 
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import dailyKey helper
+import { buildClassicShareText } from "@/lib/shareText";
 
 type Character = {
   uuid: string;
@@ -165,7 +166,7 @@ export default function ClassicGame() {
       setGuesses((prev) => [result, ...prev]);
 
       if (result.correct) {
-        markCompleted("classic");
+        markCompleted("classic", guesses.length + 1);
 
         setTimeout(() => {
           setShowWinMessage(true);
@@ -318,6 +319,7 @@ export default function ClassicGame() {
             nextUrl="/quote"
             nextLabel="Play Quote Mode →"
             onClose={() => setShowWinMessage(false)}
+            shareText={buildClassicShareText(guesses.map((g) => g.hints))}
           >
             <CountdownTimer prefixText="Next character available in:" />
           </WinMessage>

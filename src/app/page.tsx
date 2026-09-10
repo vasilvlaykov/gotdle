@@ -7,16 +7,21 @@ import GameCard from "./components/GameCard";
 import useGameProgress from "@/hooks/useGameProgress";
 import CountdownTimer from "./components/CountdownTimer";
 import DisclaimerTooltip from "./components/DisclaimerTooltip";
+import StatsModal from "./components/StatsModal";
+import { loadStats, type GoTdleStats } from "@/lib/stats";
 
 export default function HomePage() {
   const { state } = useGameProgress();
 
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [stats, setStats] = useState<GoTdleStats | null>(null);
+  const [showStats, setShowStats] = useState(false);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   const hasScrolledRef = useRef(false); // prevent repeated scrolling
 
   useEffect(() => {
     setHasHydrated(true);
+    setStats(loadStats());
   }, []);
 
   const allCompleted =
@@ -40,6 +45,21 @@ export default function HomePage() {
 
   return (
     <main style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
+      {hasHydrated && stats && (
+        <div className="flex items-center justify-center gap-4 mb-4 got-font text-white">
+          <span className="text-sm">
+            🔥 <strong>{stats.currentStreak}</strong> day streak
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowStats(true)}
+            className="text-sm underline underline-offset-2 text-yellow-200 hover:text-yellow-100"
+          >
+            View Stats
+          </button>
+        </div>
+      )}
+
       <section style={{ display: "grid", gap: "1rem" }} className="got-font">
         <Link href="/classic" passHref>
           <GameCard
@@ -82,6 +102,10 @@ export default function HomePage() {
       <div className="absolute top-4 right-4 z-50">
         <DisclaimerTooltip />
       </div>
+
+      {showStats && stats && (
+        <StatsModal stats={stats} onClose={() => setShowStats(false)} />
+      )}
     </main>
   );
 }

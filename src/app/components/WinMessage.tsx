@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import ShareResultButton from "./ShareResultButton";
 
 interface WinMessageProps {
   character: {
@@ -11,6 +12,7 @@ interface WinMessageProps {
   nextUrl: string;
   nextLabel: string;
   onClose: () => void;
+  shareText?: string;
   children?: React.ReactNode; // <-- add children here
 }
 
@@ -18,6 +20,7 @@ export default function WinMessage({
   character,
   nextUrl,
   nextLabel,
+  shareText,
   children,
 }: WinMessageProps) {
   return (
@@ -34,7 +37,8 @@ export default function WinMessage({
 
       {children}
 
-      <div className="mt-4 flex justify-center gap-4 next-game-btn">
+      <div className="mt-4 flex justify-center gap-4 next-game-btn flex-wrap">
+        {shareText && <ShareResultButton text={shareText} />}
         <a
           href={nextUrl}
           className="px-4 py-2 w-100"

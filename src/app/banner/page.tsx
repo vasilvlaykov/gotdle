@@ -6,6 +6,8 @@ import CountdownTimer from "../components/CountdownTimer";
 import confetti from "canvas-confetti";
 import useGameProgress from "@/hooks/useGameProgress";
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key helper
+import { buildSimpleShareText } from "@/lib/shareText";
+import ShareResultButton from "../components/ShareResultButton";
 
 type Banner = {
   uuid: string;
@@ -152,7 +154,7 @@ export default function BannerGame() {
       if (correct) {
         setCorrectGuess(guess);
 
-        markCompleted("banner");
+        markCompleted("banner", wrongGuesses.length + 1);
 
         setTimeout(() => {
           launchConfetti();
@@ -207,6 +209,11 @@ export default function BannerGame() {
           <p className="text-xl mb-12">
             This is the banner of House <strong>{correctGuess.house_name}</strong>.
           </p>
+          <div className="mb-6 flex justify-center">
+            <ShareResultButton
+              text={buildSimpleShareText("Banner", wrongGuesses.length + 1)}
+            />
+          </div>
           <CountdownTimer prefixText="Next banner available in:" />
         </div>
       )}

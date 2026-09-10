@@ -14,6 +14,7 @@ import {
 } from "@/lib/localStorage";
 
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key
+import { buildSimpleShareText } from "@/lib/shareText";
 
 type Character = {
   uuid: string;
@@ -171,7 +172,7 @@ export default function QuoteGame() {
     if (json.correct) {
       setCorrectGuess(character);
       setShowCelebrate(true);
-      markCompleted("quote");
+      markCompleted("quote", wrongGuesses.length + 1);
     } else {
       setWrongGuesses((prev) => [character, ...prev]);
       setJustAddedWrongGuessUuid(character.uuid);
@@ -333,6 +334,7 @@ export default function QuoteGame() {
               removeFromLocalStorage(STORAGE_KEY);
               setShowWinMessage(false);
             }}
+            shareText={buildSimpleShareText("Quote", wrongGuesses.length + 1)}
           >
             <CountdownTimer prefixText="Next character available in:" />
           </WinMessage>

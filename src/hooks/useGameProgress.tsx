@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { saveToLocalStorage, loadFromLocalStorage } from "@/lib/localStorage";
 import { getDailyKey } from "@/lib/dailyKey";
+import { recordModeWin, recordDayCompleted, type GameKey } from "@/lib/stats";
 
-export type GameKey = "classic" | "quote" | "banner";
+export type { GameKey };
 
 export type GameCompletionState = {
   classicDone: boolean;
@@ -54,13 +55,23 @@ export default function useGameProgress() {
     }
   }, [state.dateKey]);
 
-  const markCompleted = useCallback((game: GameKey) => {
-    setState((prev) => ({
-      ...prev,
-      classicDone: game === "classic" ? true : prev.classicDone,
-      quoteDone: game === "quote" ? true : prev.quoteDone,
-      bannerDone: game === "banner" ? true : prev.bannerDone,
-    }));
+  const markCompleted = useCallback((game: GameKey, guesses: number) => {
+    recordModeWin(game, guesses);
+
+    setState((prev) => {
+      const next = {
+        ...prev,
+        classicDone: game === "classic" ? true : prev.classicDone,
+        quoteDone: game === "quote" ? true : prev.quoteDone,
+        bannerDone: game === "banner" ? true : prev.bannerDone,
+      };
+
+      if (next.classicDone && next.quoteDone && next.bannerDone) {
+        recordDayCompleted(next.dateKey);
+      }
+
+      return next;
+    });
   }, []);
 
   return {
