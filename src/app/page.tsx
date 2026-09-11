@@ -46,16 +46,15 @@ export default function HomePage() {
   return (
     <main style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
       {hasHydrated && stats && (
-        <div className="flex items-center justify-center gap-4 mb-4 got-font text-white">
-          <span className="text-sm">
-            🔥 <strong>{stats.currentStreak}</strong> day streak
-          </span>
+        <div className="flex justify-center mb-4">
           <button
             type="button"
             onClick={() => setShowStats(true)}
-            className="text-sm underline underline-offset-2 text-yellow-200 hover:text-yellow-100"
+            className="streak-badge flex items-center gap-2 px-4 py-2 rounded-full got-font text-white bg-black/70 cursor-pointer"
           >
-            View Stats
+            <span className="flame-icon text-xl">🔥</span>
+            <span className="text-lg font-bold leading-none">{stats.currentStreak}</span>
+            <span className="text-sm opacity-80">day streak</span>
           </button>
         </div>
       )}

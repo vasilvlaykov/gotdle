@@ -85,8 +85,3 @@ export function recordDayCompleted(dateKey: string = getDailyKey()): GoTdleStats
   saveStats(stats);
   return stats;
 }
-
-export function averageGuesses(mode: ModeStats): number | null {
-  if (mode.played === 0) return null;
-  return mode.totalGuesses / mode.played;
-}
