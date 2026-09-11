@@ -1,9 +1,16 @@
 // lib/confetti.ts
-import confetti from "canvas-confetti";
+//
+// canvas-confetti's only rotation control is the binary `flat` option (full
+// tumbling 3D-style flip, or completely static/no rotation) — there's no way
+// to dial in a gentle rotate. So this renders emoji particles as plain DOM
+// nodes animated with the Web Animations API instead, which gives full
+// control over a subtle rotate-while-falling motion with no flip.
 
-const FIRE_ORIGIN = { x: 0.2, y: 0.7 };
-const ICE_ORIGIN = { x: 0.8, y: 0.7 };
-const CENTER_ORIGIN = { x: 0.5, y: 0.75 };
+type Origin = { xPct: number; yPct: number };
+
+const FIRE_ORIGIN: Origin = { xPct: 20, yPct: 70 };
+const ICE_ORIGIN: Origin = { xPct: 80, yPct: 70 };
+const CENTER_ORIGIN: Origin = { xPct: 50, yPct: 75 };
 
 const FIRE_EMOJI = "🔥";
 const ICE_EMOJI = "❄️";
@@ -11,106 +18,150 @@ const DRAGON_EMOJI = "🐉";
 const WOLF_EMOJI = "🐺";
 const SWORDS_EMOJI = "⚔️";
 
-const shapeCache = new Map<string, unknown>();
+const OVERLAY_ID = "gotdle-confetti-overlay";
 
-// Shapes require OffscreenCanvas, so they're only ever built lazily inside a
-// client interaction — never at module scope, which Next.js also evaluates
-// during server-side prerendering where OffscreenCanvas doesn't exist.
-function getEmojiShape(emoji: string, scalar: number) {
-  if (typeof window === "undefined") return null;
+function getOverlay(): HTMLElement {
+  const existing = document.getElementById(OVERLAY_ID);
+  if (existing) return existing;
 
-  const key = `${emoji}:${scalar}`;
-  if (!shapeCache.has(key)) {
-    shapeCache.set(key, confetti.shapeFromText({ text: emoji, scalar }));
+  const overlay = document.createElement("div");
+  overlay.id = OVERLAY_ID;
+  overlay.style.position = "fixed";
+  overlay.style.inset = "0";
+  overlay.style.pointerEvents = "none";
+  overlay.style.zIndex = "9999";
+  overlay.style.overflow = "hidden";
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+function randomBetween(min: number, max: number) {
+  return min + Math.random() * (max - min);
+}
+
+type BurstOptions = {
+  emoji: string;
+  origin: Origin;
+  count: number;
+  // Degrees from straight up; negative leans left, positive leans right.
+  angleRange: [number, number];
+  distanceRange: [number, number]; // px traveled during the initial "shot"
+  sizeRange: [number, number]; // px font-size
+};
+
+function burst(container: HTMLElement, opts: BurstOptions) {
+  const vh = window.innerHeight;
+
+  for (let i = 0; i < opts.count; i++) {
+    const angleDeg = randomBetween(opts.angleRange[0], opts.angleRange[1]);
+    const angleRad = (angleDeg - 90) * (Math.PI / 180);
+    const shotDistance = randomBetween(opts.distanceRange[0], opts.distanceRange[1]);
+
+    const midX = Math.cos(angleRad) * shotDistance;
+    const midY = Math.sin(angleRad) * shotDistance;
+
+    const fallDistance = randomBetween(vh * 0.5, vh * 0.9);
+    const driftX = randomBetween(-40, 40);
+
+    // Small, one-directional sway — never a full flip.
+    const rotateMid = randomBetween(-18, 18);
+    const rotateEnd = rotateMid + randomBetween(-18, 18);
+
+    const size = randomBetween(opts.sizeRange[0], opts.sizeRange[1]);
+    const duration = randomBetween(1800, 2600);
+    const delay = randomBetween(0, 150);
+
+    const el = document.createElement("span");
+    el.textContent = opts.emoji;
+    el.setAttribute("aria-hidden", "true");
+    el.style.position = "absolute";
+    el.style.left = `${opts.origin.xPct}%`;
+    el.style.top = `${opts.origin.yPct}%`;
+    el.style.fontSize = `${size}px`;
+    el.style.lineHeight = "1";
+    el.style.willChange = "transform, opacity";
+
+    container.appendChild(el);
+
+    const animation = el.animate(
+      [
+        { transform: "translate(-50%, -50%) translate(0px, 0px) rotate(0deg)", opacity: 1, offset: 0 },
+        {
+          transform: `translate(-50%, -50%) translate(${midX}px, ${midY}px) rotate(${rotateMid}deg)`,
+          opacity: 1,
+          offset: 0.35,
+        },
+        {
+          transform: `translate(-50%, -50%) translate(${midX + driftX}px, ${midY + fallDistance}px) rotate(${rotateEnd}deg)`,
+          opacity: 0,
+          offset: 1,
+        },
+      ],
+      {
+        duration,
+        delay,
+        easing: "cubic-bezier(0.25, 0.65, 0.4, 1)",
+        fill: "forwards",
+      }
+    );
+
+    animation.onfinish = () => el.remove();
   }
-  return shapeCache.get(key);
 }
 
 // A Game of Thrones-themed win celebration, built entirely from emoji
-// particles: mirrored fire (left) and ice (right) bursts converging toward
-// center — echoing the dragon-vs-throne art on every page — with a sprinkle
-// of larger dragon/direwolf accents on their respective sides, and crossed
-// swords rising from the middle where the two sides meet.
+// particles: mirrored fire (left) and ice (right) bursts arcing toward
+// center — echoing the dragon-vs-throne art on every page — with dragon and
+// direwolf accents on their respective sides, and crossed swords rising
+// from the middle where the two sides meet. Every particle drifts down with
+// a slight rotational sway, never a flip.
 export function launchGoTConfetti() {
   if (typeof window === "undefined") return;
 
-  const shared = {
-    startVelocity: 45,
-    gravity: 0.65,
-    decay: 0.91,
-    spread: 65,
-    ticks: 200,
-  };
+  const container = getOverlay();
 
-  const fire = getEmojiShape(FIRE_EMOJI, 1.8);
-  const ice = getEmojiShape(ICE_EMOJI, 1.8);
-  const dragon = getEmojiShape(DRAGON_EMOJI, 3.5);
-  const wolf = getEmojiShape(WOLF_EMOJI, 3);
-  const swords = getEmojiShape(SWORDS_EMOJI, 2.2);
+  burst(container, {
+    emoji: FIRE_EMOJI,
+    origin: FIRE_ORIGIN,
+    count: 100,
+    angleRange: [-20, 40],
+    distanceRange: [60, 200],
+    sizeRange: [26, 40],
+  });
 
-  if (fire) {
-    confetti({
-      ...shared,
-      particleCount: 40,
-      angle: 60,
-      origin: FIRE_ORIGIN,
-      shapes: [fire],
-      scalar: 1.8,
-    });
-  }
+  burst(container, {
+    emoji: ICE_EMOJI,
+    origin: ICE_ORIGIN,
+    count: 100,
+    angleRange: [-40, 20],
+    distanceRange: [60, 200],
+    sizeRange: [26, 40],
+  });
 
-  if (ice) {
-    confetti({
-      ...shared,
-      particleCount: 40,
-      angle: 120,
-      origin: ICE_ORIGIN,
-      shapes: [ice],
-      scalar: 1.8,
-    });
-  }
+  burst(container, {
+    emoji: DRAGON_EMOJI,
+    origin: FIRE_ORIGIN,
+    count: 24,
+    angleRange: [-15, 35],
+    distanceRange: [80, 220],
+    sizeRange: [32, 40],
+  });
 
-  if (dragon) {
-    confetti({
-      ...shared,
-      particleCount: 6,
-      angle: 65,
-      spread: 45,
-      startVelocity: 35,
-      gravity: 0.5,
-      origin: FIRE_ORIGIN,
-      shapes: [dragon],
-      // Match shapeFromText's scalar so the glyph bitmap was rendered at
-      // this resolution — keeps it crisp instead of upscaling a blurry one.
-      scalar: 3.5,
-    });
-  }
+  burst(container, {
+    emoji: WOLF_EMOJI,
+    origin: ICE_ORIGIN,
+    count: 24,
+    angleRange: [-35, 15],
+    distanceRange: [80, 220],
+    sizeRange: [32, 40],
+  });
 
-  if (wolf) {
-    confetti({
-      ...shared,
-      particleCount: 6,
-      angle: 115,
-      spread: 45,
-      startVelocity: 35,
-      gravity: 0.5,
-      origin: ICE_ORIGIN,
-      shapes: [wolf],
-      scalar: 3,
-    });
-  }
-
-  if (swords) {
-    confetti({
-      ...shared,
-      particleCount: 8,
-      angle: 90,
-      spread: 100,
-      startVelocity: 40,
-      gravity: 0.55,
-      origin: CENTER_ORIGIN,
-      shapes: [swords],
-      scalar: 2.2,
-    });
-  }
+  burst(container, {
+    emoji: SWORDS_EMOJI,
+    origin: CENTER_ORIGIN,
+    count: 26,
+    angleRange: [-60, 60],
+    distanceRange: [70, 190],
+    sizeRange: [28, 40],
+  });
 }
