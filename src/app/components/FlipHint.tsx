@@ -6,18 +6,23 @@ interface FlipHintProps {
   text: React.ReactNode;
   colorClass: string;
   delay: number;
+  // Set to false for guesses restored from storage on load, so only guesses
+  // made live during this session play the flip animation.
+  animate?: boolean;
 }
 
-export default function FlipHint({ text, colorClass, delay }: FlipHintProps) {
-  const [flipped, setFlipped] = useState(false);
+export default function FlipHint({ text, colorClass, delay, animate = true }: FlipHintProps) {
+  const [flipped, setFlipped] = useState(!animate);
 
   useEffect(() => {
+    if (!animate) return;
+
     const timeout = setTimeout(() => {
       setFlipped(true);
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [delay]);
+  }, [delay, animate]);
 
   return (
     <div

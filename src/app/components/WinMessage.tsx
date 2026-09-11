@@ -37,11 +37,11 @@ export default function WinMessage({
 
       {children}
 
-      <div className="mt-4 flex justify-center gap-4 next-game-btn flex-wrap">
+      <div className="mt-4 flex justify-center gap-4 flex-wrap">
         {shareText && <ShareResultButton text={shareText} />}
         <a
           href={nextUrl}
-          className="px-4 py-2 w-100"
+          className="px-4 py-2 w-100 next-game-btn"
         >
           {nextLabel}
         </a>

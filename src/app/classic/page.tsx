@@ -45,6 +45,10 @@ export default function ClassicGame() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Character[]>([]);
   const [guesses, setGuesses] = useState<GuessResult[]>([]);
+  // Guesses made live during this page visit — only these play the flip
+  // animation. Guesses restored from localStorage on load render already
+  // revealed, no animation.
+  const [liveGuessUuids, setLiveGuessUuids] = useState<Set<string>>(new Set());
   const [showWinMessage, setShowWinMessage] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const winMessageRef = useRef<HTMLDivElement>(null);
@@ -163,6 +167,7 @@ export default function ClassicGame() {
       }
 
       const result: GuessResult = await res.json();
+      setLiveGuessUuids((prev) => new Set(prev).add(result.guess.uuid));
       setGuesses((prev) => [result, ...prev]);
 
       if (result.correct) {
@@ -178,7 +183,7 @@ export default function ClassicGame() {
     }
   }
 
-  function renderHint(text: string, colorClass: string, delay: number) {
+  function renderHint(text: string, colorClass: string, delay: number, animate: boolean) {
     const cls = colorClass || "red";
     return (
       <FlipHint
@@ -189,6 +194,7 @@ export default function ClassicGame() {
           </AutoShrinkText>
         }
         delay={delay}
+        animate={animate}
       />
     );
   }
@@ -279,6 +285,7 @@ export default function ClassicGame() {
 
             {guesses.map((g) => {
               const baseDelay = 0;
+              const animate = liveGuessUuids.has(g.guess.uuid);
 
               return (
                 <div
@@ -293,13 +300,14 @@ export default function ClassicGame() {
                     />
                   </div>
 
-                  {renderHint(g.guess.status ?? "Unknown", g.hints.status, baseDelay + 0)}
-                  {renderHint(g.guess.gender ?? "Unknown", g.hints.gender, baseDelay + 300)}
-                  {renderHint(g.guess.region ?? "Unknown", g.hints.region, baseDelay + 600)}
+                  {renderHint(g.guess.status ?? "Unknown", g.hints.status, baseDelay + 0, animate)}
+                  {renderHint(g.guess.gender ?? "Unknown", g.hints.gender, baseDelay + 300, animate)}
+                  {renderHint(g.guess.region ?? "Unknown", g.hints.region, baseDelay + 600, animate)}
                   {renderHint(
                     formatAffiliations(g.guess.affiliations),
                     g.hints.affiliations,
-                    baseDelay + 900
+                    baseDelay + 900,
+                    animate
                   )}
                 </div>
               );
