@@ -1,37 +1,36 @@
 // lib/confetti.ts
 import confetti from "canvas-confetti";
 
-const FIRE_COLORS = ["#FF4500", "#FF8C00", "#FFD700"];
-const ICE_COLORS = ["#00BFFF", "#B0E0E6", "#FFFFFF"];
-
 const FIRE_ORIGIN = { x: 0.2, y: 0.7 };
 const ICE_ORIGIN = { x: 0.8, y: 0.7 };
+const CENTER_ORIGIN = { x: 0.5, y: 0.75 };
 
-let dragonShape: unknown = null;
-let wolfShape: unknown = null;
+const FIRE_EMOJI = "🔥";
+const ICE_EMOJI = "❄️";
+const DRAGON_EMOJI = "🐉";
+const WOLF_EMOJI = "🐺";
+const SWORDS_EMOJI = "⚔️";
+
+const shapeCache = new Map<string, unknown>();
 
 // Shapes require OffscreenCanvas, so they're only ever built lazily inside a
 // client interaction — never at module scope, which Next.js also evaluates
 // during server-side prerendering where OffscreenCanvas doesn't exist.
-function getDragonShape() {
+function getEmojiShape(emoji: string, scalar: number) {
   if (typeof window === "undefined") return null;
-  if (!dragonShape) {
-    dragonShape = confetti.shapeFromText({ text: "🐉", scalar: 3.5 });
+
+  const key = `${emoji}:${scalar}`;
+  if (!shapeCache.has(key)) {
+    shapeCache.set(key, confetti.shapeFromText({ text: emoji, scalar }));
   }
-  return dragonShape;
+  return shapeCache.get(key);
 }
 
-function getWolfShape() {
-  if (typeof window === "undefined") return null;
-  if (!wolfShape) {
-    wolfShape = confetti.shapeFromText({ text: "🐺", scalar: 3 });
-  }
-  return wolfShape;
-}
-
-// A Game of Thrones-themed win celebration: mirrored fire (left) and ice
-// (right) bursts converging toward the center, plus a light sprinkle of
-// larger dragon/direwolf particles on their respective sides.
+// A Game of Thrones-themed win celebration, built entirely from emoji
+// particles: mirrored fire (left) and ice (right) bursts converging toward
+// center — echoing the dragon-vs-throne art on every page — with a sprinkle
+// of larger dragon/direwolf accents on their respective sides, and crossed
+// swords rising from the middle where the two sides meet.
 export function launchGoTConfetti() {
   if (typeof window === "undefined") return;
 
@@ -43,33 +42,38 @@ export function launchGoTConfetti() {
     ticks: 200,
   };
 
-  confetti({
-    ...shared,
-    particleCount: 110,
-    angle: 60,
-    origin: FIRE_ORIGIN,
-    colors: FIRE_COLORS,
-    shapes: ["circle", "square"],
-    scalar: 0.9,
-  });
+  const fire = getEmojiShape(FIRE_EMOJI, 1.8);
+  const ice = getEmojiShape(ICE_EMOJI, 1.8);
+  const dragon = getEmojiShape(DRAGON_EMOJI, 3.5);
+  const wolf = getEmojiShape(WOLF_EMOJI, 3);
+  const swords = getEmojiShape(SWORDS_EMOJI, 2.2);
 
-  confetti({
-    ...shared,
-    particleCount: 110,
-    angle: 120,
-    origin: ICE_ORIGIN,
-    colors: ICE_COLORS,
-    shapes: ["circle", "square"],
-    scalar: 0.9,
-  });
+  if (fire) {
+    confetti({
+      ...shared,
+      particleCount: 40,
+      angle: 60,
+      origin: FIRE_ORIGIN,
+      shapes: [fire],
+      scalar: 1.8,
+    });
+  }
 
-  const dragon = getDragonShape();
-  const wolf = getWolfShape();
+  if (ice) {
+    confetti({
+      ...shared,
+      particleCount: 40,
+      angle: 120,
+      origin: ICE_ORIGIN,
+      shapes: [ice],
+      scalar: 1.8,
+    });
+  }
 
   if (dragon) {
     confetti({
       ...shared,
-      particleCount: 5,
+      particleCount: 6,
       angle: 65,
       spread: 45,
       startVelocity: 35,
@@ -85,7 +89,7 @@ export function launchGoTConfetti() {
   if (wolf) {
     confetti({
       ...shared,
-      particleCount: 5,
+      particleCount: 6,
       angle: 115,
       spread: 45,
       startVelocity: 35,
@@ -93,6 +97,20 @@ export function launchGoTConfetti() {
       origin: ICE_ORIGIN,
       shapes: [wolf],
       scalar: 3,
+    });
+  }
+
+  if (swords) {
+    confetti({
+      ...shared,
+      particleCount: 8,
+      angle: 90,
+      spread: 100,
+      startVelocity: 40,
+      gravity: 0.55,
+      origin: CENTER_ORIGIN,
+      shapes: [swords],
+      scalar: 2.2,
     });
   }
 }
