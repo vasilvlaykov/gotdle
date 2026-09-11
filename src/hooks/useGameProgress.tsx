@@ -11,6 +11,7 @@ export type GameCompletionState = {
   classicDone: boolean;
   quoteDone: boolean;
   bannerDone: boolean;
+  wordsDone: boolean;
   dateKey: string;
 };
 
@@ -21,6 +22,7 @@ function defaultState(): GameCompletionState {
     classicDone: false,
     quoteDone: false,
     bannerDone: false,
+    wordsDone: false,
     dateKey: getDailyKey(),
   };
 }
@@ -64,9 +66,10 @@ export default function useGameProgress() {
         classicDone: game === "classic" ? true : prev.classicDone,
         quoteDone: game === "quote" ? true : prev.quoteDone,
         bannerDone: game === "banner" ? true : prev.bannerDone,
+        wordsDone: game === "words" ? true : prev.wordsDone,
       };
 
-      if (next.classicDone && next.quoteDone && next.bannerDone) {
+      if (next.classicDone && next.quoteDone && next.bannerDone && next.wordsDone) {
         recordDayCompleted(next.dateKey);
       }
 

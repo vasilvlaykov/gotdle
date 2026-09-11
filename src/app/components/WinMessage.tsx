@@ -9,10 +9,11 @@ interface WinMessageProps {
     name: string;
     image_url: string;
   };
-  nextUrl: string;
-  nextLabel: string;
+  nextUrl?: string;
+  nextLabel?: string;
   onClose: () => void;
   shareText?: string;
+  revealText?: React.ReactNode;
   children?: React.ReactNode; // <-- add children here
 }
 
@@ -21,6 +22,7 @@ export default function WinMessage({
   nextUrl,
   nextLabel,
   shareText,
+  revealText,
   children,
 }: WinMessageProps) {
   return (
@@ -32,19 +34,22 @@ export default function WinMessage({
         className="mx-auto w-32 h-32 rounded object-cover mb-4 character-hint-img"
       />
       <p className="text-2xl mb-2">
-        Today's character is <strong>{character.name}</strong>.
+        {revealText ?? (
+          <>
+            Today&apos;s character is <strong>{character.name}</strong>.
+          </>
+        )}
       </p>
 
       {children}
 
       <div className="mt-4 flex justify-center gap-4 flex-wrap">
         {shareText && <ShareResultButton text={shareText} />}
-        <a
-          href={nextUrl}
-          className="px-4 py-2 w-100 next-game-btn"
-        >
-          {nextLabel}
-        </a>
+        {nextUrl && nextLabel && (
+          <a href={nextUrl} className="px-4 py-2 w-100 next-game-btn">
+            {nextLabel}
+          </a>
+        )}
       </div>
     </div>
   );

@@ -25,7 +25,7 @@ export default function HomePage() {
   }, []);
 
   const allCompleted =
-    state.classicDone && state.quoteDone && state.bannerDone;
+    state.classicDone && state.quoteDone && state.bannerDone && state.wordsDone;
 
   // Smooth scroll to banner once it appears
   useEffect(() => {
@@ -79,6 +79,13 @@ export default function HomePage() {
             title="Banner"
             description="Guess the house banner"
             icon="banner"
+          />
+        </Link>
+        <Link href="/words" passHref>
+          <GameCard
+            title="Words"
+            description="Guess the house from its words"
+            emojiIcon="📜"
           />
         </Link>
       </section>

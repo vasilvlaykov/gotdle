@@ -194,10 +194,13 @@ export default function BannerGame() {
           <p className="text-xl mb-12">
             This is the banner of House <strong>{correctGuess.house_name}</strong>.
           </p>
-          <div className="mb-6 flex justify-center">
+          <div className="mb-6 flex justify-center gap-4 flex-wrap">
             <ShareResultButton
               text={buildSimpleShareText("Banner", wrongGuesses.length + 1)}
             />
+            <a href="/words" className="px-4 py-2 w-100 next-game-btn">
+              Play Words Mode →
+            </a>
           </div>
           <CountdownTimer prefixText="Next banner available in:" />
         </div>

@@ -7,12 +7,15 @@ type Props = {
   title: string;
   description: string;
   icon?: string;
+  // Fallback rendered icon for modes without a dedicated /assets/*-icon.png yet.
+  emojiIcon?: string;
 };
 
 export default function GameCard({
   title,
   description,
   icon,
+  emojiIcon,
 }: Props) {
   return (
     <div
@@ -57,13 +60,17 @@ export default function GameCard({
         }}
         aria-hidden="true"
       >
-        <Image
-          src={`/assets/${icon}-icon.png`}
-          alt={`${icon}`}
-          width={70}
-          height={70}
-          priority
-        />
+        {icon ? (
+          <Image
+            src={`/assets/${icon}-icon.png`}
+            alt={`${icon}`}
+            width={70}
+            height={70}
+            priority
+          />
+        ) : (
+          <span style={{ fontSize: "2.5rem", lineHeight: 1 }}>{emojiIcon}</span>
+        )}
       </div>
       <div>
         <h2

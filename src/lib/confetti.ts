@@ -39,7 +39,8 @@ export function launchGoTConfetti() {
     gravity: 0.65,
     decay: 0.91,
     spread: 65,
-    ticks: 200,
+    ticks: 350,
+    scalar: 4,
   };
 
   const fire = getEmojiShape(FIRE_EMOJI, 1.8);
@@ -51,29 +52,27 @@ export function launchGoTConfetti() {
   if (fire) {
     confetti({
       ...shared,
-      particleCount: 40,
+      particleCount: 80,
       angle: 60,
       origin: FIRE_ORIGIN,
       shapes: [fire],
-      scalar: 1.8,
     });
   }
 
   if (ice) {
     confetti({
       ...shared,
-      particleCount: 40,
+      particleCount: 80,
       angle: 120,
       origin: ICE_ORIGIN,
       shapes: [ice],
-      scalar: 1.8,
     });
   }
 
   if (dragon) {
     confetti({
       ...shared,
-      particleCount: 6,
+      particleCount: 80,
       angle: 65,
       spread: 45,
       startVelocity: 35,
@@ -82,35 +81,32 @@ export function launchGoTConfetti() {
       shapes: [dragon],
       // Match shapeFromText's scalar so the glyph bitmap was rendered at
       // this resolution — keeps it crisp instead of upscaling a blurry one.
-      scalar: 3.5,
     });
   }
 
   if (wolf) {
     confetti({
       ...shared,
-      particleCount: 6,
+      particleCount: 80,
       angle: 115,
       spread: 45,
       startVelocity: 35,
       gravity: 0.5,
       origin: ICE_ORIGIN,
       shapes: [wolf],
-      scalar: 3,
     });
   }
 
   if (swords) {
     confetti({
       ...shared,
-      particleCount: 8,
+      particleCount: 80,
       angle: 90,
       spread: 100,
       startVelocity: 40,
       gravity: 0.55,
       origin: CENTER_ORIGIN,
       shapes: [swords],
-      scalar: 2.2,
     });
   }
 }

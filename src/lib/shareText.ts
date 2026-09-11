@@ -33,9 +33,12 @@ export function buildClassicShareText(
   ].join("\n");
 }
 
-// Quote/Banner modes: no per-attribute hints, just wrong guesses (🟥) then
-// the winning guess (🟩).
-export function buildSimpleShareText(mode: "Quote" | "Banner", guessCount: number): string {
+// Quote/Banner/Words modes: no per-attribute hints, just wrong guesses (🟥)
+// then the winning guess (🟩).
+export function buildSimpleShareText(
+  mode: "Quote" | "Banner" | "Words",
+  guessCount: number
+): string {
   const date = getDailyKey();
   const row = HINT_EMOJI.red.repeat(Math.max(0, guessCount - 1)) + HINT_EMOJI.green;
 

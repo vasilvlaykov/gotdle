@@ -2,7 +2,7 @@
 import { saveToLocalStorage, loadFromLocalStorage } from "./localStorage";
 import { getDailyKey } from "./dailyKey";
 
-export type GameKey = "classic" | "quote" | "banner";
+export type GameKey = "classic" | "quote" | "banner" | "words";
 
 export type ModeStats = {
   played: number;
@@ -16,6 +16,7 @@ export type GoTdleStats = {
   classic: ModeStats;
   quote: ModeStats;
   banner: ModeStats;
+  words: ModeStats;
 };
 
 const STATS_KEY = "gotdleStats";
@@ -32,6 +33,7 @@ function defaultStats(): GoTdleStats {
     classic: emptyModeStats(),
     quote: emptyModeStats(),
     banner: emptyModeStats(),
+    words: emptyModeStats(),
   };
 }
 
