@@ -6,7 +6,7 @@ import FlipHint from "../components/FlipHint";
 import WinMessage from "../components/WinMessage";
 import CountdownTimer from "../components/CountdownTimer";
 import { sortSuggestions } from "@/utils/sortSuggestions";
-import confetti from "canvas-confetti";
+import { launchGoTConfetti } from "@/lib/confetti";
 import useGameProgress from "@/hooks/useGameProgress";
 import {
   saveToLocalStorage,
@@ -135,19 +135,6 @@ export default function ClassicGame() {
     }
   }
 
-  function launchConfetti() {
-    confetti({
-      particleCount: 350,
-      spread: 200,
-      startVelocity: 20,
-      gravity: 0.4,
-      decay: 0.95,
-      origin: { x: 0.5, y: 0.5 },
-      colors: ["FF4500", "00BFFF"],
-      shapes: ["circle", "circle", "square"],
-    });
-  }
-
   async function handleGuess(character: Character) {
     setQuery("");
     setSuggestions([]);
@@ -175,7 +162,7 @@ export default function ClassicGame() {
 
         setTimeout(() => {
           setShowWinMessage(true);
-          launchConfetti();
+          launchGoTConfetti();
         }, 1200);
       }
     } catch (err) {

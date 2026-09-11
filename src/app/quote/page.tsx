@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { sortSuggestions } from "@/utils/sortSuggestions";
 import WinMessage from "../components/WinMessage";
 import CountdownTimer from "../components/CountdownTimer";
-import confetti from "canvas-confetti";
+import { launchGoTConfetti } from "@/lib/confetti";
 import useGameProgress from "@/hooks/useGameProgress";
 
 import {
@@ -102,19 +102,6 @@ export default function QuoteGame() {
       hintRevealed,
     });
   }, [quote, wrongGuesses, correctGuess, showWinMessage, hintRevealed, STORAGE_KEY]);
-
-  function launchConfetti() {
-    confetti({
-      particleCount: 350,
-      spread: 200,
-      startVelocity: 20,
-      gravity: 0.4,
-      decay: 0.95,
-      origin: { x: 0.5, y: 0.5 },
-      colors: ["FF4500", "00BFFF"],
-      shapes: ["circle", "circle", "square"],
-    });
-  }
 
   useEffect(() => {
     async function loadCharacters() {
@@ -275,7 +262,7 @@ export default function QuoteGame() {
             onAnimationEnd={() => {
               setShowCelebrate(false);
               setShowWinMessage(true);
-              launchConfetti();
+              launchGoTConfetti();
               setTimeout(() => {
                 winRef.current?.scrollIntoView({ behavior: "smooth" });
               }, 200);

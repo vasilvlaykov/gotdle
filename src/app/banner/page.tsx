@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { sortSuggestions } from "@/utils/sortSuggestions";
 import CountdownTimer from "../components/CountdownTimer";
-import confetti from "canvas-confetti";
+import { launchGoTConfetti } from "@/lib/confetti";
 import useGameProgress from "@/hooks/useGameProgress";
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key helper
 import { buildSimpleShareText } from "@/lib/shareText";
@@ -114,21 +114,6 @@ export default function BannerGame() {
     correctGuess ? "&revealed=1" : ""
   }`;
 
-  function launchConfetti() {
-    if (!bannerRef.current) return;
-
-    confetti({
-      particleCount: 350,
-      spread: 200,
-      startVelocity: 20,
-      gravity: 0.4,
-      decay: 0.95,
-      origin: { x: 0.5, y: 0.5 },
-      colors: ["FF4500", "00BFFF"],
-      shapes: ["circle", "circle", "square"],
-    });
-  }
-
   async function handleGuess(guess: Banner) {
     setQuery("");
     setSuggestions([]);
@@ -157,7 +142,7 @@ export default function BannerGame() {
         markCompleted("banner", wrongGuesses.length + 1);
 
         setTimeout(() => {
-          launchConfetti();
+          launchGoTConfetti();
 
           successRef.current?.scrollIntoView({
             behavior: "smooth",
