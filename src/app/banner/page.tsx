@@ -6,7 +6,7 @@ import CountdownTimer from "../components/CountdownTimer";
 import { launchGoTConfetti } from "@/lib/confetti";
 import useGameProgress from "@/hooks/useGameProgress";
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key helper
-import { buildSimpleShareText } from "@/lib/shareText";
+import { buildSimpleShareText, buildShareUrl } from "@/lib/shareText";
 import ShareResultButton from "../components/ShareResultButton";
 
 type Banner = {
@@ -197,6 +197,7 @@ export default function BannerGame() {
           <div className="mb-6 flex justify-center gap-4 flex-wrap">
             <ShareResultButton
               text={buildSimpleShareText("Banner", wrongGuesses.length + 1)}
+              url={buildShareUrl("banner", wrongGuesses.length + 1)}
             />
             <a href="/words" className="px-4 py-2 w-100 next-game-btn">
               Play Words Mode →

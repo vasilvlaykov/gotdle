@@ -12,7 +12,7 @@ import {
   removeFromLocalStorage,
 } from "@/lib/localStorage";
 import { getDailyKey } from "@/lib/dailyKey";
-import { buildSimpleShareText } from "@/lib/shareText";
+import { buildSimpleShareText, buildShareUrl } from "@/lib/shareText";
 
 type Banner = {
   uuid: string;
@@ -271,7 +271,10 @@ export default function WordsGame() {
               removeFromLocalStorage(STORAGE_KEY);
               setShowWinMessage(false);
             }}
-            shareText={buildSimpleShareText("Words", wrongGuesses.length + 1)}
+            share={{
+              text: buildSimpleShareText("Words", wrongGuesses.length + 1),
+              url: buildShareUrl("words", wrongGuesses.length + 1),
+            }}
           >
             <CountdownTimer prefixText="Next words available in:" />
           </WinMessage>

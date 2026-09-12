@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { GoTdleStats } from "@/lib/stats";
+import { buildShareUrl } from "@/lib/shareText";
+import ShareResultButton from "./ShareResultButton";
 
 type Props = {
   stats: GoTdleStats;
@@ -42,6 +44,14 @@ export default function StatsModal({ stats, onClose }: Props) {
           {stats.maxStreak > stats.currentStreak && (
             <div className="text-xs mt-1 opacity-70">
               Best: {stats.maxStreak} days
+            </div>
+          )}
+          {stats.currentStreak > 0 && (
+            <div className="mt-3 flex justify-center">
+              <ShareResultButton
+                text={`🔥 ${stats.currentStreak} Day GoTdle Streak!`}
+                url={buildShareUrl("streak", stats.currentStreak)}
+              />
             </div>
           )}
         </div>

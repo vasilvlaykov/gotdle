@@ -14,7 +14,7 @@ import {
 } from "@/lib/localStorage";
 
 import { getDailyKey } from "@/lib/dailyKey"; // <-- import daily key
-import { buildSimpleShareText } from "@/lib/shareText";
+import { buildSimpleShareText, buildShareUrl } from "@/lib/shareText";
 
 type Character = {
   uuid: string;
@@ -321,7 +321,10 @@ export default function QuoteGame() {
               removeFromLocalStorage(STORAGE_KEY);
               setShowWinMessage(false);
             }}
-            shareText={buildSimpleShareText("Quote", wrongGuesses.length + 1)}
+            share={{
+              text: buildSimpleShareText("Quote", wrongGuesses.length + 1),
+              url: buildShareUrl("quote", wrongGuesses.length + 1),
+            }}
           >
             <CountdownTimer prefixText="Next character available in:" />
           </WinMessage>

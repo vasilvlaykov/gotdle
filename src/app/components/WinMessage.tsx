@@ -12,7 +12,7 @@ interface WinMessageProps {
   nextUrl?: string;
   nextLabel?: string;
   onClose: () => void;
-  shareText?: string;
+  share?: { text: string; url: string };
   revealText?: React.ReactNode;
   children?: React.ReactNode; // <-- add children here
 }
@@ -21,7 +21,7 @@ export default function WinMessage({
   character,
   nextUrl,
   nextLabel,
-  shareText,
+  share,
   revealText,
   children,
 }: WinMessageProps) {
@@ -44,7 +44,7 @@ export default function WinMessage({
       {children}
 
       <div className="mt-4 flex justify-center gap-4 flex-wrap">
-        {shareText && <ShareResultButton text={shareText} />}
+        {share && <ShareResultButton text={share.text} url={share.url} />}
         {nextUrl && nextLabel && (
           <a href={nextUrl} className="px-4 py-2 w-100 next-game-btn">
             {nextLabel}
