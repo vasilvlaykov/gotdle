@@ -301,11 +301,6 @@ body {
    screen without scrolling. Uses !important because GameCard/Logo set
    these via inline style={}, which otherwise wins over any stylesheet rule. */
 @media (max-width: 640px) {
-  .site-logo-img {
-    width: 110px !important;
-    height: auto !important;
-  }
-
   .home-cards {
     gap: 0.5rem !important;
   }
