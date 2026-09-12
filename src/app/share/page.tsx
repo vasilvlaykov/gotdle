@@ -16,6 +16,8 @@ const MODE_META: Record<string, { emoji: string; icon: string; label: string }> 
   words: { emoji: "📜", icon: "words", label: "Words" },
 };
 
+const ALL_MODE_ICONS = ["throne", "quotes", "banner", "words"];
+
 function describeResult(params: ShareParams) {
   const mode = params.mode ?? "classic";
 
@@ -26,6 +28,7 @@ function describeResult(params: ShareParams) {
       heading: `${days} Day Streak!`,
       description: `I'm on a ${days} day GoTdle streak. Can you beat it?`,
       icon: null as string | null,
+      isStreak: true,
     };
   }
 
@@ -36,6 +39,7 @@ function describeResult(params: ShareParams) {
     heading: `${meta.label}: Solved in ${guesses}!`,
     description: `I solved today's GoTdle ${meta.label} puzzle in ${guesses} guesses. Think you can beat me?`,
     icon: meta.icon,
+    isStreak: false,
   };
 }
 
@@ -79,12 +83,34 @@ export default async function SharePage({
   searchParams: Promise<ShareParams>;
 }) {
   const params = await searchParams;
-  const { heading, description, icon } = describeResult(params);
+  const { heading, description, icon, isStreak } = describeResult(params);
 
   return (
     <main style={{ padding: "0 2rem", maxWidth: 500, margin: "auto" }}>
       <div className="game-box rounded-2xl p-6 mt-8 got-font text-white text-center">
-        {icon ? (
+        {isStreak ? (
+          <div className="flex items-center justify-center gap-3 mb-3">
+            {ALL_MODE_ICONS.slice(0, 2).map((slug) => (
+              <Image
+                key={slug}
+                src={`/assets/${slug}-icon.png`}
+                alt=""
+                width={48}
+                height={48}
+              />
+            ))}
+            <span className="flame-icon text-5xl">🔥</span>
+            {ALL_MODE_ICONS.slice(2).map((slug) => (
+              <Image
+                key={slug}
+                src={`/assets/${slug}-icon.png`}
+                alt=""
+                width={48}
+                height={48}
+              />
+            ))}
+          </div>
+        ) : icon ? (
           <Image
             src={`/assets/${icon}-icon.png`}
             alt=""
@@ -92,9 +118,7 @@ export default async function SharePage({
             height={80}
             className="mx-auto mb-3"
           />
-        ) : (
-          <span className="flame-icon text-6xl block mb-3">🔥</span>
-        )}
+        ) : null}
         <h1 className="text-2xl font-bold mb-3">{heading}</h1>
         <p className="mb-6 opacity-80">{description}</p>
         <Link

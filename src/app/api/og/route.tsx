@@ -12,11 +12,12 @@ const MODE_META: Record<string, { icon: string; label: string }> = {
 export async function GET(req: Request) {
   const { searchParams, origin } = new URL(req.url);
   const mode = searchParams.get("mode") ?? "classic";
+  const isStreak = mode === "streak";
 
   let iconUrl: string | null = null;
   let heading: string;
 
-  if (mode === "streak") {
+  if (isStreak) {
     const days = Math.max(1, parseInt(searchParams.get("days") ?? "1", 10) || 1);
     heading = `${days} Day Streak!`;
   } else {
@@ -53,17 +54,51 @@ export async function GET(req: Request) {
         >
           GOTDLE
         </div>
-        {iconUrl ? (
+        {isStreak ? (
+          <div style={{ display: "flex", alignItems: "center", marginTop: 16 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) needs a plain <img>, not next/image */}
+            <img
+              src={`${origin}/assets/throne-icon.png`}
+              width={100}
+              height={100}
+              alt=""
+              style={{ display: "flex" }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${origin}/assets/quotes-icon.png`}
+              width={100}
+              height={100}
+              alt=""
+              style={{ display: "flex", marginLeft: 20 }}
+            />
+            <div style={{ display: "flex", fontSize: 170, margin: "0 24px" }}>🔥</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${origin}/assets/banner-icon.png`}
+              width={100}
+              height={100}
+              alt=""
+              style={{ display: "flex" }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${origin}/assets/words-icon.png`}
+              width={100}
+              height={100}
+              alt=""
+              style={{ display: "flex", marginLeft: 20 }}
+            />
+          </div>
+        ) : (
           // eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) needs a plain <img>, not next/image
           <img
-            src={iconUrl}
+            src={iconUrl!}
             width={180}
             height={180}
             alt=""
             style={{ display: "flex", marginTop: 16 }}
           />
-        ) : (
-          <div style={{ display: "flex", fontSize: 160, marginTop: 16 }}>🔥</div>
         )}
         <div style={{ display: "flex", fontSize: 60, fontWeight: 700, marginTop: 8 }}>
           {heading}
