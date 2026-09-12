@@ -1,27 +1,28 @@
 import { ImageResponse } from "next/og";
 
-const MODE_META: Record<string, { emoji: string; label: string }> = {
-  classic: { emoji: "🏰", label: "Classic" },
-  quote: { emoji: "🗨️", label: "Quote" },
-  banner: { emoji: "🛡️", label: "Banner" },
-  words: { emoji: "📜", label: "Words" },
+// Matches the /assets/{icon}-icon.png convention used by the home page's
+// GameCard, so the share card reuses the exact same mode icons.
+const MODE_META: Record<string, { icon: string; label: string }> = {
+  classic: { icon: "throne", label: "Classic" },
+  quote: { icon: "quotes", label: "Quote" },
+  banner: { icon: "banner", label: "Banner" },
+  words: { icon: "words", label: "Words" },
 };
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+  const { searchParams, origin } = new URL(req.url);
   const mode = searchParams.get("mode") ?? "classic";
 
-  let emoji: string;
+  let iconUrl: string | null = null;
   let heading: string;
 
   if (mode === "streak") {
     const days = Math.max(1, parseInt(searchParams.get("days") ?? "1", 10) || 1);
-    emoji = "🔥";
     heading = `${days} Day Streak!`;
   } else {
     const meta = MODE_META[mode] ?? MODE_META.classic;
     const guesses = Math.max(1, parseInt(searchParams.get("g") ?? "1", 10) || 1);
-    emoji = meta.emoji;
+    iconUrl = `${origin}/assets/${meta.icon}-icon.png`;
     heading = `${meta.label}: Solved in ${guesses}!`;
   }
 
@@ -52,7 +53,18 @@ export async function GET(req: Request) {
         >
           GOTDLE
         </div>
-        <div style={{ display: "flex", fontSize: 160, marginTop: 16 }}>{emoji}</div>
+        {iconUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) needs a plain <img>, not next/image
+          <img
+            src={iconUrl}
+            width={180}
+            height={180}
+            alt=""
+            style={{ display: "flex", marginTop: 16 }}
+          />
+        ) : (
+          <div style={{ display: "flex", fontSize: 160, marginTop: 16 }}>🔥</div>
+        )}
         <div style={{ display: "flex", fontSize: 60, fontWeight: 700, marginTop: 8 }}>
           {heading}
         </div>
