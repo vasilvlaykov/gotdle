@@ -7,12 +7,14 @@ type Props = {
   title: string;
   description: string;
   icon?: string;
+  isNew?: boolean;
 };
 
 export default function GameCard({
   title,
   description,
   icon,
+  isNew,
 }: Props) {
   return (
     <div
@@ -57,6 +59,27 @@ export default function GameCard({
         }}
         aria-hidden="true"
       >
+        {isNew && (
+          <span
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "14px",
+              fontSize: "0.65rem",
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              color: "#F3E7C9",
+              background: "linear-gradient(to bottom, #8a5a44, #5c3a2a)",
+              border: "1px solid #C1A753",
+              borderRadius: "4px",
+              padding: "2px 6px",
+              textTransform: "uppercase",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.5)",
+            }}
+          >
+            New
+          </span>
+        )}
         <Image
           src={`/assets/${icon}-icon.png`}
           alt={`${icon}`}

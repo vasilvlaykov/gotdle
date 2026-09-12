@@ -86,6 +86,7 @@ export default function HomePage() {
             title="Words"
             description="Guess the house from its words"
             icon="words"
+            isNew
           />
         </Link>
       </section>
