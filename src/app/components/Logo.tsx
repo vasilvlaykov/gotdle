@@ -22,8 +22,10 @@ export default function Logo() {
         <Image
           src="/assets/logo.png"
           alt="Go to homepage"
+          // Source file is 610x409 (ratio ~1.49:1) — width/height here must
+          // match that ratio or the browser stretches it to fit a square box.
           width={300}
-          height={300}
+          height={201}
           priority
           className="site-logo-img"
         />
