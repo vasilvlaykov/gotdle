@@ -85,7 +85,7 @@ export default function HomePage() {
           <GameCard
             title="Words"
             description="Guess the house from its words"
-            emojiIcon="📜"
+            icon="words"
           />
         </Link>
       </section>

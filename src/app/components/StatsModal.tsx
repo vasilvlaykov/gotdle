@@ -11,13 +11,12 @@ type Props = {
 const MODES: {
   key: "classic" | "quote" | "banner" | "words";
   label: string;
-  icon?: string;
-  emojiIcon?: string;
+  icon: string;
 }[] = [
   { key: "classic", label: "Classic", icon: "throne" },
   { key: "quote", label: "Quote", icon: "quotes" },
   { key: "banner", label: "Banner", icon: "banner" },
-  { key: "words", label: "Words", emojiIcon: "📜" },
+  { key: "words", label: "Words", icon: "words" },
 ];
 
 export default function StatsModal({ stats, onClose }: Props) {
@@ -48,21 +47,17 @@ export default function StatsModal({ stats, onClose }: Props) {
         </div>
 
         <div className="space-y-2 mb-6">
-          {MODES.map(({ key, label, icon, emojiIcon }) => (
+          {MODES.map(({ key, label, icon }) => (
             <div
               key={key}
               className="flex items-center gap-3 bg-black/20 rounded-lg px-3 py-2"
             >
-              {icon ? (
-                <Image
-                  src={`/assets/${icon}-icon.png`}
-                  alt=""
-                  width={28}
-                  height={28}
-                />
-              ) : (
-                <span className="text-2xl leading-none w-7 text-center">{emojiIcon}</span>
-              )}
+              <Image
+                src={`/assets/${icon}-icon.png`}
+                alt=""
+                width={28}
+                height={28}
+              />
               <span className="flex-1 text-left font-semibold">{label}</span>
               <span className="text-sm opacity-80">
                 {stats[key].played} played
