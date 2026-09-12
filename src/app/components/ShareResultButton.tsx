@@ -72,12 +72,14 @@ export default function ShareResultButton({ text, url }: Props) {
   async function handleClick() {
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        // Deliberately omit a separate `url` field: some share targets
-        // (notably Messenger on Android) treat `text` and `url` as two
-        // things to send — the text, plus an auto-generated link preview —
-        // producing two separate messages. Folding the link into `text`
-        // sends it as a single message everywhere.
-        await navigator.share({ title: "GoTdle", text: fullText });
+        // Share only the URL. Some targets (Messenger on Android, confirmed
+        // by testing) badly mangle/duplicate the message when descriptive
+        // text and a link are both present — the app tries to generate its
+        // own preview alongside the raw text and corrupts the result. The
+        // /share page carries its own Open Graph title/description/image,
+        // so the bare link still unfurls into the full result card on every
+        // platform that supports link previews.
+        await navigator.share({ url });
         return;
       } catch (err) {
         // AbortError = the user closed the native share sheet — not a failure.
