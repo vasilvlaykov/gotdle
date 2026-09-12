@@ -25,6 +25,7 @@ export default function Logo() {
           width={300}
           height={300}
           priority
+          className="site-logo-img"
         />
       </div>
     </Link>

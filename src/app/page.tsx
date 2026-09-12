@@ -50,7 +50,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setShowStats(true)}
-            className="streak-badge flex items-center gap-2 px-4 py-2 rounded-full got-font text-white bg-black/70 cursor-pointer"
+            className="streak-badge flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-full got-font text-white bg-black/70 cursor-pointer"
           >
             <span className="flame-icon text-xl">🔥</span>
             <span className="text-lg font-bold leading-none">{stats.currentStreak}</span>
@@ -59,7 +59,7 @@ export default function HomePage() {
         </div>
       )}
 
-      <section style={{ display: "grid", gap: "1rem" }} className="got-font">
+      <section style={{ display: "grid", gap: "1rem" }} className="got-font home-cards">
         <Link href="/classic" passHref>
           <GameCard
             title="Classic"

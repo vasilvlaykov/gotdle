@@ -72,7 +72,12 @@ export default function ShareResultButton({ text, url }: Props) {
   async function handleClick() {
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        await navigator.share({ title: "GoTdle", text, url });
+        // Deliberately omit a separate `url` field: some share targets
+        // (notably Messenger on Android) treat `text` and `url` as two
+        // things to send — the text, plus an auto-generated link preview —
+        // producing two separate messages. Folding the link into `text`
+        // sends it as a single message everywhere.
+        await navigator.share({ title: "GoTdle", text: fullText });
         return;
       } catch (err) {
         // AbortError = the user closed the native share sheet — not a failure.

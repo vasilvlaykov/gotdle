@@ -18,6 +18,7 @@ export default function GameCard({
 }: Props) {
   return (
     <div
+      className="game-card"
       style={{
         position: "relative",
         display: "flex",
@@ -49,6 +50,7 @@ export default function GameCard({
       }}
     >
       <div
+        className="game-card-icon-wrap"
         style={{
           fontSize: "2rem",
           marginRight: "1rem",
@@ -81,6 +83,7 @@ export default function GameCard({
           </span>
         )}
         <Image
+          className="game-card-icon-img"
           src={`/assets/${icon}-icon.png`}
           alt={`${icon}`}
           width={70}
@@ -90,6 +93,7 @@ export default function GameCard({
       </div>
       <div>
         <h2
+          className="game-card-title"
           style={{
             margin: 0,
             fontWeight: "700",
@@ -101,6 +105,7 @@ export default function GameCard({
           {title}
         </h2>
         <p
+          className="game-card-desc"
           style={{
             margin: 0,
             color: "#C7C3BB",

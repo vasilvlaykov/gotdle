@@ -296,3 +296,39 @@ body {
 .modal-pop {
   animation: modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* Shrink the logo and home page mode cards so all four fit on a phone
+   screen without scrolling. Uses !important because GameCard/Logo set
+   these via inline style={}, which otherwise wins over any stylesheet rule. */
+@media (max-width: 640px) {
+  .site-logo-img {
+    width: 110px !important;
+    height: 110px !important;
+  }
+
+  .home-cards {
+    gap: 0.5rem !important;
+  }
+
+  .game-card {
+    padding: 0.55rem 0.85rem !important;
+  }
+
+  .game-card-icon-wrap {
+    margin-right: 0.65rem !important;
+    min-width: 1.75rem !important;
+  }
+
+  .game-card-icon-img {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .game-card-title {
+    font-size: 1.2rem !important;
+  }
+
+  .game-card-desc {
+    font-size: 0.8rem !important;
+  }
+}
