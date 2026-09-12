@@ -14,6 +14,9 @@ interface WinMessageProps {
   onClose: () => void;
   share?: { text: string; url: string };
   revealText?: React.ReactNode;
+  // Set false for non-square images (e.g. a shield-shaped house banner)
+  // where a square border/frame looks mismatched.
+  imageBordered?: boolean;
   children?: React.ReactNode; // <-- add children here
 }
 
@@ -23,6 +26,7 @@ export default function WinMessage({
   nextLabel,
   share,
   revealText,
+  imageBordered = true,
   children,
 }: WinMessageProps) {
   return (
@@ -31,7 +35,9 @@ export default function WinMessage({
       <img
         src={character.image_url}
         alt={character.name}
-        className="mx-auto w-32 h-32 rounded object-cover mb-4 character-hint-img"
+        className={`mx-auto w-32 h-32 object-cover mb-4 ${
+          imageBordered ? "rounded character-hint-img" : ""
+        }`}
       />
       <p className="text-2xl mb-2">
         {revealText ?? (

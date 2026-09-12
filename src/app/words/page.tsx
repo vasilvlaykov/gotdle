@@ -267,6 +267,7 @@ export default function WordsGame() {
                 These are the words of House <strong>{correctGuess.house_name}</strong>.
               </>
             }
+            imageBordered={false}
             onClose={() => {
               removeFromLocalStorage(STORAGE_KEY);
               setShowWinMessage(false);
